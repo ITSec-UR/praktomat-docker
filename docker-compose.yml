@@ -1,0 +1,39 @@
+version: "3.6"
+
+services:
+  prakomat:
+    container_name: ${COMPOSE_PROJECT_NAME}_praktomat
+    image: lehrstuhlkesdogan/praktomat:jdk17-jammy
+    ports:
+      - 80:443
+    links:
+      - db
+    depends_on:
+      - db
+    environment:
+      - DB_NAME
+      - DB_USER
+      - DB_PASS
+      - DB_HOST
+      - USE_LDAP
+      - COMPOSE_PROJECT_NAME
+      - PRAKTOMAT_NAME
+      - PRAKTOMAT_DOMAIN
+      - PRAKTOMAT_ADMIN
+
+    secrets:
+      - db_pass
+
+  db:
+    container_name: ${COMPOSE_PROJECT_NAME}_db
+    image: postgres:16.2-alpine
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD_FILE=${DB_PASS}
+    secrets:
+      - db_pass
+
+secrets:
+  db_pass:
+    file: db_pass.txt
