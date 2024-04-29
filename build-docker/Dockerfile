@@ -116,7 +116,7 @@ COPY ldapserver.pem /etc/ssl/certs/ldapserver.pem
 RUN printf "\nTLS_CACERT    /etc/ssl/certs/ldapserver.pem\n" | sudo tee -a /etc/ldap/ldap.conf
 
 # Initialize Praktomat
-RUN COMPOSE_PROJECT_NAME="" PRAKTOMAT_NAME="" PRAKTOMAT_DOMAIN="" USE_LDAP="" DB_NAME="" DB_USER="" DB_PASS="" DB_HOST="" python3 Praktomat/src/manage-local.py collectstatic --noinput --link
+RUN COMPOSE_PROJECT_NAME="" PRAKTOMAT_NAME="" PRAKTOMAT_DOMAIN="" USE_LDAP="" POSTGRES_DB="" POSTGRES_USER="" POSTGRES_PASSWORD="" POSTGRES_HOST="" python3 Praktomat/src/manage-local.py collectstatic --noinput --link
 
 # Configure Cron to automatically run all checkers
 COPY daily-cron.sh daily-cron.sh

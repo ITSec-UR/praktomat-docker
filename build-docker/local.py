@@ -64,15 +64,15 @@ DEBUG = MIRROR
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME':   environ['DB_NAME'],
-        'USER':   environ['DB_USER'],
-        'PASSWORD':   environ['DB_PASS'],
-        'HOST':   environ['DB_HOST'],
+        'NAME':   environ['POSTGRES_DB'],
+        'USER':   environ['POSTGRES_USER'],
+        'PASSWORD':   environ['POSTGRES_PASSWORD'],
+        'HOST':   environ['POSTGRES_HOST'],
     }
 }
 
-if exists(environ['DB_PASS']):
-    with open(environ['DB_PASS']) as f:
+if exists(environ['POSTGRES_PASSWORD']):
+    with open(environ['POSTGRES_PASSWORD']) as f:
         DATABASES['default']['PASSWORD'] = f.read()
 
 # on linux command line  create database and databaseuser

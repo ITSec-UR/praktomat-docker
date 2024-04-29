@@ -14,9 +14,10 @@ The following environment variables need to be set (`.env` file) for running the
 - `PRAKTOMAT_DOMAIN`: The domain under which your instance(s) will be reachable
 - `PRAKTOMAT_ADMIN`: The email address of the administrator for the Praktomat instance
 - `USE_LDAP`: Set to `True` to use LDAP for authentication, otherwise local registration is used. If set to `True` local registration is disabled.
-- `DB_HOST`: PostgreSQL hostname (container name). Make sure that the host is accessible, i.e. it must be in the same network (or namespace) as the Pratomat.
-- `DB_NAME`: Database username
-- `DB_PASS`: Database password. It can also point to a file (like docker secrets).
+- `POSTGRES_HOST`: PostgreSQL hostname (container name). Make sure that the host is accessible, i.e. it must be in the same network (or namespace) as the Pratomat.
+- `POSTGRES_DB`: Database name
+- `POSTGRES_USER`: Database username
+- `POSTGRES_PASSWORD`: Database password. It can also point to a file (like docker secrets).
 
 Two containers are going to be created and started. One container contains a PostgreSQL database and one container contains the actual Praktomat application.  
 
