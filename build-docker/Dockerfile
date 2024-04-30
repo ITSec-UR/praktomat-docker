@@ -82,6 +82,10 @@ RUN sudo chmod 775 wait-for-it.sh
 RUN python3 -m pip install --upgrade pip && python3 -m pip install -U pip virtualenv setuptools wheel urllib3[secure]
 RUN python3 -m pip install -r Praktomat/requirements.txt
 
+# Install necessary libraries for rsa keys
+COPY tools/create_rsa.keys.py create_rsa.keys.py
+RUN python3 -m pip install cryptography
+
 # Set executable/search flag for directories (only) located inside of /home/praktomat/.local
 # This is required for Apache in order to follow the symlinks to some files (referenced from static directory)
 RUN chmod -R g+X .local
