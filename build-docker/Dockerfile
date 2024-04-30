@@ -67,8 +67,8 @@ RUN chmod 440 /etc/sudoers
 
 USER praktomat
 WORKDIR /home/praktomat
-RUN git clone https://github.com/KITPraktomatTeam/Praktomat.git Praktomat && cd Praktomat \
-  && git checkout 92d1cf50157426e7aa3cd20e665bfb31ffe2f25a
+RUN git clone https://github.com/hso-praktomat/praktomat Praktomat && cd Praktomat \
+  && git checkout 9a53822a9ed1a530fefed2f782c273f1caa95b49
 RUN sudo chown praktomat:tester Praktomat/src/checker/scripts/java
 RUN sudo chown praktomat:tester Praktomat/src/checker/scripts/javac
 RUN sudo chmod u+x,g+x,o-x Praktomat/src/checker/scripts/java
@@ -83,7 +83,7 @@ RUN python3 -m pip install --upgrade pip && python3 -m pip install -U pip virtua
 RUN python3 -m pip install -r Praktomat/requirements.txt
 
 # Install necessary libraries for rsa keys
-COPY tools/create_rsa.keys.py create_rsa.keys.py
+COPY tools/create_rsakeys.py create_rsakeys.py
 RUN sudo python3 -m pip install cryptography
 
 # Set executable/search flag for directories (only) located inside of /home/praktomat/.local
@@ -120,7 +120,7 @@ COPY ldapserver.pem /etc/ssl/certs/ldapserver.pem
 RUN printf "\nTLS_CACERT    /etc/ssl/certs/ldapserver.pem\n" | sudo tee -a /etc/ldap/ldap.conf
 
 # Initialize Praktomat
-RUN COMPOSE_PROJECT_NAME="" PRAKTOMAT_NAME="" PRAKTOMAT_DOMAIN="" USE_LDAP="" POSTGRES_DB="" POSTGRES_USER="" POSTGRES_PASSWORD="" POSTGRES_HOST="" python3 Praktomat/src/manage-local.py collectstatic --noinput --link
+RUN COMPOSE_PROJECT_NAME="" PRAKTOMAT_NAME="" PRAKTOMAT_DOMAIN="" USE_LDAP="" POSTGRES_USER="" POSTGRES_PASSWORD="" POSTGRES_HOST="" POSTGRES_PORT="" python3 Praktomat/src/manage-local.py collectstatic --noinput --link
 
 # Configure Cron to automatically run all checkers
 COPY daily-cron.sh daily-cron.sh

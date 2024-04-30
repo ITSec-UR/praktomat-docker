@@ -64,10 +64,11 @@ DEBUG = MIRROR
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME':   environ['POSTGRES_DB'],
+        'NAME':   environ['POSTGRES_USER'],
         'USER':   environ['POSTGRES_USER'],
         'PASSWORD':   environ['POSTGRES_PASSWORD'],
         'HOST':   environ['POSTGRES_HOST'],
+        'PORT':   environ['POSTGRES_PORT']
     }
 }
 
@@ -114,20 +115,20 @@ USEPRAKTOMATTESTER = True
 # for using Docker from https://github.com/nomeata/safe-docker
 # Use docker to test submission
 USESAFEDOCKER = False
-#SAFE_DOCKER_PATH = '/usr/local/bin/safe-docker'
-#DOCKER_IMAGE_NAME = 'safe-docker'
-#DOCKER_CONTAINER_WRITABLE = environ.get('PRAKTOMAT_CHECKER_WRITABLE') == 'True'
-#DOCKER_UID_MOD = environ.get('PRAKTOMAT_CHECKER_UID_MOD') == 'True'
-#DOCKER_CONTAINER_EXTERNAL_DIR = None if environ.get(
+# SAFE_DOCKER_PATH = '/usr/local/bin/safe-docker'
+# DOCKER_IMAGE_NAME = 'safe-docker'
+# DOCKER_CONTAINER_WRITABLE = environ.get('PRAKTOMAT_CHECKER_WRITABLE') == 'True'
+# DOCKER_UID_MOD = environ.get('PRAKTOMAT_CHECKER_UID_MOD') == 'True'
+# DOCKER_CONTAINER_EXTERNAL_DIR = None if environ.get(
 #    'PRAKTOMAT_CHECKER_EXTERNAL_DIR') == 'None' or environ.get(
 #    'PRAKTOMAT_CHECKER_EXTERNAL_DIR') == '' else environ.get('PRAKTOMAT_CHECKER_EXTERNAL_DIR')
 # If the Docker container should be able to access the host's network
 # When this is set to false, the container does not have any access to the network.
-#DOCKER_CONTAINER_HOST_NET = environ.get(
+# DOCKER_CONTAINER_HOST_NET = environ.get(
 #    'PRAKTOMAT_CHECKER_ENABLE_NETWORK') == 'True'
 # If the altered files should not be copied back into the sandbox directory
 # after running a check with safe-docker.
-#DOCKER_DISCARD_ARTEFACTS = True
+# DOCKER_DISCARD_ARTEFACTS = True
 
 # Linux User "tester" and Usergroup "praktomat"
 # Enable to run all scripts (checker) as the unix user 'tester'.
