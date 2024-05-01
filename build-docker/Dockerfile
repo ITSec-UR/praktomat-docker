@@ -124,7 +124,7 @@ RUN COMPOSE_PROJECT_NAME="" PRAKTOMAT_NAME="" PRAKTOMAT_DOMAIN="" USE_LDAP="" PO
 
 # Configure Cron to automatically run all checkers
 COPY daily-cron.sh daily-cron.sh
-RUN (crontab -l ; echo "0 3 * * * bash /home/praktomat/daily-cron.sh >> /home/praktomat/cronlog 2>&1") | crontab -
+RUN (crontab -l ; echo "0 2 * * * bash /home/praktomat/daily-cron.sh >> /home/praktomat/cronlog 2>&1") | crontab -
 
 COPY run.sh run.sh
 RUN sudo chmod 775 run.sh
