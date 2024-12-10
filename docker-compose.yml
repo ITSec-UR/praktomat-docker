@@ -1,7 +1,7 @@
 services:
   praktomat:
     container_name: ${COMPOSE_PROJECT_NAME}_praktomat
-    image: lehrstuhlkesdogan/praktomat:jdk17-jammy
+    image: lehrstuhlkesdogan/praktomat:jdk21-jammy
     ports:
       - 80:443
     links:

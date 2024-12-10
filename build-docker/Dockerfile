@@ -38,8 +38,8 @@ RUN apt-get update && apt-get install -yq \
   lsb-release \
   && rm -rf /var/lib/apt/lists/*
 
-# Install java (openjdk-17)
-RUN apt-get update && apt install -y openjdk-17-jdk junit4 junit && rm -rf /var/lib/apt/lists/*
+# Install java (openjdk-21)
+RUN apt-get update && apt install -y openjdk-21-jdk junit4 junit && rm -rf /var/lib/apt/lists/*
 
 #RUN ln -s /usr/bin/python3 /usr/bin/python
 
