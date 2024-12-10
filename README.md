@@ -5,7 +5,7 @@ This repository is a containerized version of [KIT Praktomat](https://github.com
 ## Install to localhost
 For test purposes you can simply install a local setup.  
 ```bash
-docker-compose up -d
+docker compose up -d
 ```  
 
 The following environment variables need to be set (`.env` file) for running the container.

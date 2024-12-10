@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Wait for database to be available
-./wait-for-it.sh ${POSTGRES_HOST}:5432
+./wait-for-it.sh ${POSTGRES_HOST}:${POSTGRES_PORT}
 
 # Dump environment variables (required for running checkers with cron)
 env | egrep "^(PRAKTOMAT|COMPOSE_PROJECT_NAME|PATH)" > praktomat.env

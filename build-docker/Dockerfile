@@ -3,7 +3,7 @@ EXPOSE 443/tcp
 
 # Setup timezone
 # Installing tzdata in the next step is required too
-ENV TZ Europe/Berlin
+ENV TZ=Europe/Berlin
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install system requirements
@@ -46,8 +46,8 @@ RUN apt-get update && apt install -y openjdk-17-jdk junit4 junit && rm -rf /var/
 # Setup locale
 RUN locale-gen en_US.UTF-8
 RUN update-locale LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US.UTF-8
 
 # Install Docker
 #RUN mkdir -p /etc/apt/keyrings
@@ -105,8 +105,8 @@ COPY local.py Praktomat/src/settings/local.py
 RUN mkdir -p debug-data work-data test-data
 
 # Configure Apache2
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
+ENV APACHE_RUN_USER=www-data
+ENV APACHE_RUN_GROUP=www-data
 RUN sudo adduser www-data praktomat
 RUN sudo a2enmod macro
 COPY praktomat.wsgi Praktomat/wsgi/praktomat.wsgi
@@ -127,4 +127,4 @@ RUN (crontab -l ; echo "0 2 * * * bash /home/praktomat/daily-cron.sh >> /home/pr
 
 COPY run.sh run.sh
 RUN sudo chmod 775 run.sh
-ENTRYPOINT ./run.sh
+ENTRYPOINT ["./run.sh"]
