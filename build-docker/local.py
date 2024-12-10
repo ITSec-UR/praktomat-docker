@@ -40,6 +40,10 @@ TEST_MAXMEM = 1000
 
 TEST_MAXFILENUMBER = 8192
 
+# Saving an attestation for a solution with a lot of files might fail with the
+# default value of 1000.
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 2000
+
 # Absolute path to the directory that shall hold all uploaded files as well as
 # files created at runtime.
 
@@ -83,6 +87,8 @@ if exists(environ['POSTGRES_PASSWORD']):
 # sudo -u postgres createdb -O <db_user> <db_name>
 # sudo -u postgres createdb -O praktomat praktomat_2017s
 
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 # SECRET_KEY gets generated via defaults.py
 
 # Private key used to sign uploded solution files in submission confirmation email
@@ -105,29 +111,20 @@ if environ['USE_LDAP'].lower() == 'true':
 else:
     REGISTRATION_POSSIBLE = True
 
-
 SYSADMIN_MOTD_URL = None
 
 # Use a dedicated user to test submissions
 USEPRAKTOMATTESTER = True
 
 # It is recomendet to use DOCKER and not a tester account
-# for using Docker from https://github.com/nomeata/safe-docker
+
 # Use docker to test submission
 USESAFEDOCKER = False
-# SAFE_DOCKER_PATH = '/usr/local/bin/safe-docker'
-# DOCKER_IMAGE_NAME = 'safe-docker'
-# DOCKER_CONTAINER_WRITABLE = environ.get('PRAKTOMAT_CHECKER_WRITABLE') == 'True'
-# DOCKER_UID_MOD = environ.get('PRAKTOMAT_CHECKER_UID_MOD') == 'True'
-# DOCKER_CONTAINER_EXTERNAL_DIR = None if environ.get(
-#    'PRAKTOMAT_CHECKER_EXTERNAL_DIR') == 'None' or environ.get(
-#    'PRAKTOMAT_CHECKER_EXTERNAL_DIR') == '' else environ.get('PRAKTOMAT_CHECKER_EXTERNAL_DIR')
-# If the Docker container should be able to access the host's network
-# When this is set to false, the container does not have any access to the network.
-# DOCKER_CONTAINER_HOST_NET = environ.get(
-#    'PRAKTOMAT_CHECKER_ENABLE_NETWORK') == 'True'
-# If the altered files should not be copied back into the sandbox directory
-# after running a check with safe-docker.
+# DOCKER_IMAGE_NAME = environ['PRAKTOMAT_CHECKER_IMAGE']
+# DOCKER_CONTAINER_WRITABLE = environ['PRAKTOMAT_CHECKER_WRITABLE'] == 'True'
+# DOCKER_UID_MOD = environ['PRAKTOMAT_CHECKER_UID_MOD'] == 'True'
+# DOCKER_CONTAINER_EXTERNAL_DIR = environ.get('PRAKTOMAT_CHECKER_EXTERNAL_DIR')
+# DOCKER_CONTAINER_HOST_NET = environ.get('PRAKTOMAT_CHECKER_ENABLE_NETWORK') == 'True'
 # DOCKER_DISCARD_ARTEFACTS = True
 
 # Linux User "tester" and Usergroup "praktomat"
@@ -141,15 +138,11 @@ USESAFEDOCKER = False
 # "_www		ALL=(tester) NOPASSWD: ALL"
 # "developer	ALL=(tester) NOPASSWD: ALL"
 
-# Add the following lines to the end of the file
-# to allow user Praktomat the execution of scriptfile  safe-docker  without requiring a password:
-# "praktomat	ALL= NOPASSWD: /usr/local/bin/safe-docker"
-
 # If you want to switch between "testuser" and "Docker"
 # use "sudo visudo -f /etc/sudoers.d/praktomat-tester"
 # "_www		ALL=(tester) NOPASSWD: ALL"
 # "developer	ALL=(tester) NOPASSWD: ALL"
-# "praktomat 	ALL=(tester) NOPASSWD: ALL, NOPASSWD: /usr/local/bin/safe-docker"
+# "praktomat 	ALL=(tester) NOPASSWD: ALL"
 #
 # be sure that you change file permission
 # sudo chown praktomat:tester praktomat/src/checker/scripts/java
@@ -181,13 +174,15 @@ MIMETYPE_ADDITIONAL_EXTENSIONS = \
     [("application/x-iml", ".iml"),
      ("application/yaml", ".yml"),
      ("application/yaml", ".yaml"),
+     ("text/plain", ".lark"),
      ("text/plain", ".properties"),
      ("text/x-gradle", ".gradle"),
      ("text/x-gradle", ".gradle.kts"),
      ("text/x-isabelle", ".thy"),
      ("text/x-lean", ".lean"),
      ("text/x-log", ".log"),
-     ("text/x-r-script", ".R"),]
+     ("text/x-r-script", ".R"),
+     ("text/x-python", ".py")]
 
 # There's something fishy with the maximum file size set via ulimit
 # We set it to a large value to avoid problems with the Haskell checker
