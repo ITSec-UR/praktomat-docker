@@ -55,4 +55,4 @@ You should specify volumes to enable persistent data after a crash.
 ## Rancher
 You can set secrets as environment variables with `Prefix or Alias` field. For healthcheck you can use
 - PostgreSQL: `pg_isready -d praktomat`
-- Praktomat: HTTP request to `/` returns a successful status
+- Praktomat: HTTP request to `/` returns a successful status. When creating the workload show advanced options and set `Privilege Escalation` to `true`. 
