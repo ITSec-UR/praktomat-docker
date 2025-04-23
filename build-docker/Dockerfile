@@ -1,5 +1,9 @@
-FROM ubuntu:24.04
+FROM ubuntu:noble
 EXPOSE 443/tcp
+
+# Remove default ubuntu user
+# We'll add our own Praktomat user instead
+RUN touch /var/mail/ubuntu && chown ubuntu /var/mail/ubuntu && userdel -r ubuntu
 
 # Setup timezone
 # Installing tzdata in the next step is required too
@@ -19,7 +23,7 @@ RUN apt-get update && apt-get install -yq \
   libffi-dev \
   swig \
   libapache2-mod-xsendfile \
-  libapache2-mod-wsgi-py3  \
+  libapache2-mod-wsgi-py3 \
   git-core \
   libldap2-dev \
   python3-setuptools \
@@ -30,8 +34,6 @@ RUN apt-get update && apt-get install -yq \
   locales \
   tzdata \
   cron \
-  libipc-run-perl \
-  libdata-guid-perl \
   ca-certificates \
   curl \
   gnupg \
@@ -60,7 +62,7 @@ ENV LANGUAGE=en_US.UTF-8
 #  && rm -rf /var/lib/apt/lists/*
 
 # Add users
-RUN useradd -m praktomat && adduser praktomat sudo
+RUN useradd -m praktomat -u 1000 && adduser praktomat sudo
 RUN useradd -m tester && adduser tester sudo && adduser tester praktomat
 COPY sudoers /etc/sudoers
 RUN chmod 440 /etc/sudoers
@@ -79,7 +81,6 @@ ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/81b1373f17855a4dc211
 RUN sudo chmod 775 wait-for-it.sh
 
 # Install Python requirements for Praktomat
-RUN python3 -m pip install --break-system-packages -U pip virtualenv setuptools wheel urllib3[secure]
 RUN python3 -m pip install --break-system-packages -r Praktomat/requirements.txt
 
 # Install necessary libraries for rsa keys
