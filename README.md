@@ -13,7 +13,7 @@ The following environment variables need to be set (`.env` file) for running the
 - `PRAKTOMAT_NAME`: This is the name of your site. It will be displayed at the top of the web interface.
 - `PRAKTOMAT_DOMAIN`: The domain under which your instance(s) will be reachable
 - `PRAKTOMAT_ADMIN`: The email address of the administrator for the Praktomat instance
-- `USE_LDAP`: Set to `True` to use LDAP for authentication, otherwise local registration is used. If set to `True` local registration is disabled.
+- `PRAKTOMAT_LDAP`: Set to `True` to use LDAP for authentication, otherwise local registration is used. If set to `True` local registration is disabled.
 - `POSTGRES_HOST`: PostgreSQL hostname (container name). Make sure that the host is accessible, i.e. it must be in the same network (or namespace) as the Pratomat.
 - `POSTGRES_DB`: Database name
 - `POSTGRES_USER`: Database username

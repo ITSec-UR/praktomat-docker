@@ -68,16 +68,17 @@ DEBUG = MIRROR
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME':   environ['POSTGRES_USER'],
-        'USER':   environ['POSTGRES_USER'],
-        'PASSWORD':   environ['POSTGRES_PASSWORD'],
-        'HOST':   environ['POSTGRES_HOST'],
-        'PORT':   environ['POSTGRES_PORT']
+        'NAME':   environ.get('POSTGRES_USER'),
+        'USER':   environ.get('POSTGRES_USER'),
+        'PASSWORD':   environ.get('POSTGRES_PASSWORD'),
+        'HOST':   environ.get('POSTGRES_HOST'),
+        'PORT':   environ.get('POSTGRES_PORT')
     }
 }
 
-if exists(environ['POSTGRES_PASSWORD']):
-    with open(environ['POSTGRES_PASSWORD']) as f:
+db_pass = environ.get('POSTGRES_PASSWORD')
+if db_pass and exists(db_pass):
+    with open(db_pass) as f:
         DATABASES['default']['PASSWORD'] = f.read()
 
 # on linux command line  create database and databaseuser
@@ -101,7 +102,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SHIB_ENABLED = False
 
 # Set this to False to disable registration via the website, e.g. when Single Sign On is used
-if environ['USE_LDAP'].lower() == 'true':
+if environ.get('PRAKTOMAT_LDAP', 'false').lower() == 'true':
     REGISTRATION_POSSIBLE = False
     LDAP_ENABLED = True
     LDAP_URI = "ldaps://ldap.uni-regensburg.de"
@@ -109,6 +110,7 @@ if environ['USE_LDAP'].lower() == 'true':
     DUMMY_MAT_NUMBERS = True
     ACCOUNT_CHANGE_POSSIBLE = False
 else:
+    LDAP_ENABLED = False
     REGISTRATION_POSSIBLE = True
 
 SYSADMIN_MOTD_URL = None
@@ -120,9 +122,9 @@ USEPRAKTOMATTESTER = True
 
 # Use docker to test submission
 USESAFEDOCKER = False
-# DOCKER_IMAGE_NAME = environ['PRAKTOMAT_CHECKER_IMAGE']
-# DOCKER_CONTAINER_WRITABLE = environ['PRAKTOMAT_CHECKER_WRITABLE'] == 'True'
-# DOCKER_UID_MOD = environ['PRAKTOMAT_CHECKER_UID_MOD'] == 'True'
+# DOCKER_IMAGE_NAME = environ.get('PRAKTOMAT_CHECKER_IMAGE')
+# DOCKER_CONTAINER_WRITABLE = environ.get('PRAKTOMAT_CHECKER_WRITABLE', 'False') == 'True'
+# DOCKER_UID_MOD = environ.get('PRAKTOMAT_CHECKER_UID_MOD') == 'True'
 # DOCKER_CONTAINER_EXTERNAL_DIR = environ.get('PRAKTOMAT_CHECKER_EXTERNAL_DIR')
 # DOCKER_CONTAINER_HOST_NET = environ.get('PRAKTOMAT_CHECKER_ENABLE_NETWORK') == 'True'
 # DOCKER_DISCARD_ARTEFACTS = True

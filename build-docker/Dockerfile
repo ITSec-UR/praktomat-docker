@@ -1,4 +1,4 @@
-FROM ubuntu:jammy
+FROM ubuntu:24.04
 EXPOSE 443/tcp
 
 # Setup timezone
@@ -67,23 +67,24 @@ RUN chmod 440 /etc/sudoers
 
 USER praktomat
 WORKDIR /home/praktomat
-RUN git clone https://github.com/hso-praktomat/praktomat Praktomat && cd Praktomat
+RUN git clone --recursive https://github.com/hso-praktomat/praktomat Praktomat && cd Praktomat
 RUN sudo chown praktomat:tester Praktomat/src/checker/scripts/java
 RUN sudo chown praktomat:tester Praktomat/src/checker/scripts/javac
 RUN sudo chmod u+x,g+x,o-x Praktomat/src/checker/scripts/java
 RUN sudo chmod u+x,g+x,o-x Praktomat/src/checker/scripts/javac
+RUN echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 
 # Get wait-for-it.sh (used to wait for PostgreSQL to become available)
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/81b1373f17855a4dc21156cfe1694c31d7d1792e/wait-for-it.sh wait-for-it.sh
 RUN sudo chmod 775 wait-for-it.sh
 
 # Install Python requirements for Praktomat
-RUN python3 -m pip install --upgrade pip && python3 -m pip install -U pip virtualenv setuptools wheel urllib3[secure]
-RUN python3 -m pip install -r Praktomat/requirements.txt
+RUN python3 -m pip install --break-system-packages -U pip virtualenv setuptools wheel urllib3[secure]
+RUN python3 -m pip install --break-system-packages -r Praktomat/requirements.txt
 
 # Install necessary libraries for rsa keys
 COPY tools/create_rsakeys.py create_rsakeys.py
-RUN sudo python3 -m pip install cryptography
+RUN sudo python3 -m pip install --break-system-packages cryptography
 
 # Set executable/search flag for directories (only) located inside of /home/praktomat/.local
 # This is required for Apache in order to follow the symlinks to some files (referenced from static directory)

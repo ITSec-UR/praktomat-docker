@@ -1,7 +1,7 @@
 services:
   praktomat:
     container_name: ${COMPOSE_PROJECT_NAME}_praktomat
-    image: lehrstuhlkesdogan/praktomat:jdk21-jammy
+    image: lehrstuhlkesdogan/praktomat:jdk21-ubuntu
     ports:
       - 80:443
     links:
@@ -13,7 +13,7 @@ services:
       - POSTGRES_PASSWORD
       - POSTGRES_HOST
       - POSTGRES_PORT
-      - USE_LDAP
+      - PRAKTOMAT_LDAP
       - COMPOSE_PROJECT_NAME
       - PRAKTOMAT_NAME
       - PRAKTOMAT_DOMAIN
@@ -24,7 +24,7 @@ services:
 
   db:
     container_name: ${COMPOSE_PROJECT_NAME}_db
-    image: postgres:16.2-alpine
+    image: postgres:17.4-alpine
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD_FILE=${POSTGRES_PASSWORD}
