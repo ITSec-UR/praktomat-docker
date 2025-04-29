@@ -100,6 +100,9 @@ RUN chmod -R 640 /opt/praktomat-addons/*
 # Install safe-docker
 #ADD https://raw.githubusercontent.com/nomeata/safe-docker/master/safe-docker /usr/local/bin/safe-docker
 
+# Copy style.css
+COPY style.css Praktomat/media/styles/style.css
+
 # Copy config file
 COPY local.py Praktomat/src/settings/local.py
 
