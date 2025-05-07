@@ -101,7 +101,9 @@ RUN chmod -R 640 /opt/praktomat-addons/*
 #ADD https://raw.githubusercontent.com/nomeata/safe-docker/master/safe-docker /usr/local/bin/safe-docker
 
 # Copy style.css
-COPY style.css Praktomat/media/styles/style.css
+RUN sed -i '/<link type="text\/css" rel="stylesheet" href="{% static "styles\/style.css" %}" \/>/a\'$'\n''\t<link type="text/css" rel="stylesheet" href="{% static "styles/style-modern.css" %}" />' Praktomat/src/templates/base.html
+COPY --chown=praktomat style-modern.css Praktomat/media/styles/style-modern.css
+RUN chmod +x Praktomat/media/styles/style-modern.css
 
 # Copy config file
 COPY local.py Praktomat/src/settings/local.py
