@@ -100,8 +100,11 @@ RUN chmod -R 640 /opt/praktomat-addons/*
 # Install safe-docker
 #ADD https://raw.githubusercontent.com/nomeata/safe-docker/master/safe-docker /usr/local/bin/safe-docker
 
-# Copy style.css
-RUN sed -i '/<link type="text\/css" rel="stylesheet" href="{% static "styles\/style.css" %}" \/>/a\'$'\n''\t<link type="text/css" rel="stylesheet" href="{% static "styles/style-modern.css" %}" />' Praktomat/src/templates/base.html
+# Modernize style.css
+RUN sed -i '/<head>/a\
+	<meta name="viewport" content="width=device-width, initial-scale=1">' Praktomat/src/templates/base.html
+RUN sed -i '/<link type="text\/css" rel="stylesheet" href="{% static "styles\/style.css" %}" \/>/a\
+	<link type="text/css" rel="stylesheet" href="{% static "styles/style-modern.css" %}" />' Praktomat/src/templates/base.html
 COPY --chown=praktomat style-modern.css Praktomat/media/styles/style-modern.css
 RUN chmod +x Praktomat/media/styles/style-modern.css
 

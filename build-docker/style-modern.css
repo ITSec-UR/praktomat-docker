@@ -111,9 +111,26 @@ label {
   margin-bottom: 0.3rem;
 }
 
-a:active {
-  color: var(--accent-light);
-  background-color: rgba(62, 136, 247, 0.1);
+/* === Improve Task List/Solution Upload === */
+
+#solution_upload > div:has(.left, .right),
+#task_list > div:has(.left, .right) {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* Left/right sections - default desktop layout */
+.left, .right {
+  flex: 1;
+  min-width: 300px;
+}
+
+.left {
+  order: 1;
+}
+
+.right {
+  order: 2;
 }
 
 /* === Tables: More Responsive === */
@@ -177,16 +194,20 @@ textarea:focus {
   outline-offset: 2px;
 }
 
+a:active {
+  color: var(--accent-light);
+  background-color: rgba(62, 136, 247, 0.1);
+}
+
 /* Make side-by-side layout responsive */
 @media (max-width: 768px) {
-  #task_list div.left,
-  #task_list div.right,
-  #soluion_upload div.left,
-  #soluion_upload div.right {
-    float: none;
-    width: 100%;
+  .left, .right {
+    flex: 0 0 100%; /* Force full width */
+    min-width: 100%;
+  }
+
+  :is(#task_list, #solution_upload) :is(div.left, div.right) {
     padding: 0;
-    margin-bottom: 1rem;
   }
 
   #user-tools {
@@ -201,25 +222,14 @@ textarea:focus {
     font-size: clamp(1.5rem, 5vw, 2rem);
   }
 
-  #login > #form {
+  #login #form {
     width: 100%;
   }
 
-  input[type="submit"] {
-    margin-left: 0;
+  #login input[type="text"],
+  #login input[type="password"],
+  #login input[type="submit"] {
     width: 100%;
-  }
-
-  .form-row {
-    margin-bottom: 1.5rem;
-  }
-
-  form .help {
-    margin-left: 0;
-    display: block;
-  }
-
-  form .errorlist li {
-    width: auto;
+    box-sizing: border-box;
   }
 }
