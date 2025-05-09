@@ -10,7 +10,6 @@ env | egrep "^(PRAKTOMAT|COMPOSE_PROJECT_NAME|POSTGRES|PATH)" > praktomat.env
 sudo cron
 
 # Apply migrations and run Praktomat
-python3 Praktomat/src/manage-local.py makemigrations
 python3 Praktomat/src/manage-local.py migrate --noinput
 python3 Praktomat/src/manage-local.py createsuperuser --username praktomat --no-input --email ${PRAKTOMAT_ADMIN}
 sudo -E apache2ctl -DFOREGROUND

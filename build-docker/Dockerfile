@@ -69,7 +69,7 @@ RUN chmod 440 /etc/sudoers
 
 USER praktomat
 WORKDIR /home/praktomat
-RUN git clone --recursive https://github.com/hso-praktomat/praktomat Praktomat && cd Praktomat
+RUN git clone --recursive https://github.com/ITSec-UR/praktomat Praktomat && cd Praktomat
 RUN sudo chown praktomat:tester Praktomat/src/checker/scripts/java
 RUN sudo chown praktomat:tester Praktomat/src/checker/scripts/javac
 RUN sudo chmod u+x,g+x,o-x Praktomat/src/checker/scripts/java
@@ -99,17 +99,6 @@ RUN chmod -R 640 /opt/praktomat-addons/*
 
 # Install safe-docker
 #ADD https://raw.githubusercontent.com/nomeata/safe-docker/master/safe-docker /usr/local/bin/safe-docker
-
-# Modernize style.css
-RUN sed -i '/<head>/a\
-	<meta name="viewport" content="width=device-width, initial-scale=1">' Praktomat/src/templates/base.html
-RUN sed -i '/<link type="text\/css" rel="stylesheet" href="{% static "styles\/style.css" %}" \/>/a\
-	<link type="text/css" rel="stylesheet" href="{% static "styles/style-modern.css" %}" />' Praktomat/src/templates/base.html
-COPY --chown=praktomat style-modern.css Praktomat/media/styles/style-modern.css
-RUN chmod +x Praktomat/media/styles/style-modern.css
-
-# Change TextChecker.py
-COPY --chown=praktomat TextChecker.py Praktomat/src/checker/checker/TextChecker.py
 
 # Copy config file
 COPY local.py Praktomat/src/settings/local.py
