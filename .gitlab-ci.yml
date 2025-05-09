@@ -4,8 +4,8 @@ stages:
 # Define the job to deploy, which will require a TAG as input
 deploy_job:
   stage: deploy
+  script:
+    - echo "Deploying with TAG: $TAG_VARIABLE"
   when: manual
   only:
     - main
-  variables:
-    TAG_VARIABLE: "default_tag"  # Default value (can be overwritten when triggered manually)
