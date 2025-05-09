@@ -108,6 +108,9 @@ RUN sed -i '/<link type="text\/css" rel="stylesheet" href="{% static "styles\/st
 COPY --chown=praktomat style-modern.css Praktomat/media/styles/style-modern.css
 RUN chmod +x Praktomat/media/styles/style-modern.css
 
+# Change TextChecker.py
+COPY --chown=praktomat TextChecker.py Praktomat/src/checker/checker/TextChecker.py
+
 # Copy config file
 COPY local.py Praktomat/src/settings/local.py
 
