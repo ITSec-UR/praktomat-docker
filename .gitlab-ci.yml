@@ -13,9 +13,11 @@ build-and-push:
   variables:
     DOCKER_DRIVER: overlay2
   before_script:
+    - echo "Before Script"
     - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
   script:
     |
+    echo "Start with username = $DOCKERHUB_USERNAME and password = $DOCKERHUB_PASSWORD"
     if [ -z "$VERSION" ]; then echo "ERROR: VERSION is required"; exit 1; fi
     BASE_TAG="${BASE_TAG:-$DEFAULT_BASE_TAG}"
     FULL_TAG="$BASE_TAG-$VERSION"
