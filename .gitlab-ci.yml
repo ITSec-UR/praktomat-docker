@@ -13,14 +13,14 @@ build-and-push:
   variables:
     DOCKER_DRIVER: overlay2
   before_script:
-    - echo "Before Script"
+    - git config --global url."https://${CI_REPO_USER}:${CI_REPO_TOKEN}@gitlab.itsec.ur.de/".insteadOf "https://gitlab.itsec.ur.de/"
     - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
   script:
     |
-    echo "Start with username = $DOCKERHUB_USERNAME and password = $DOCKERHUB_PASSWORD"
     if [ -z "$VERSION" ]; then echo "ERROR: VERSION is required"; exit 1; fi
     BASE_TAG="${BASE_TAG:-$DEFAULT_BASE_TAG}"
     FULL_TAG="$BASE_TAG-$VERSION"
+    git clone https://gitlab.itsec.ur.de/lehrstuhl/develop/praktomat-docker.git
     echo "Building image: $IMAGE_NAME:$FULL_TAG"
     docker build -t "$IMAGE_NAME:$FULL_TAG" .
     docker push "$IMAGE_NAME:$FULL_TAG"
