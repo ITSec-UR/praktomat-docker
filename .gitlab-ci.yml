@@ -33,3 +33,4 @@ build:
       docker push "$IMAGE_NAME:latest"
   only:
     - web
+  when: manual
