@@ -1,29 +1,28 @@
 stages:
   - build
 
-variables:
-  IMAGE_NAME: "lehrstuhlkesdogan/praktomat"
-  DEFAULT_BASE_TAG: "jdk21-noble"
+image: docker:latest
+services:
+  - docker:dind
 
-build-and-push:
+variables:
+  DOCKER_DRIVER: overlay2
+  IMAGE_NAME: "DOCKERHUB_USERNAME/praktomat"
+  BASE_TAG: "jdk21-noble"
+
+build:
   stage: build
-  image: docker:24.0.5
-  services:
-    - docker:24.0.5-dind
-  variables:
-    DOCKER_DRIVER: overlay2
   before_script:
     - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
   script:
-    - git config --global user.email "kesdogan.Technik@ur.de"
-    - git config --global user.name "GitLab CI/CD Bot"
-    - git remote set-url --push origin "https://gitlab-ci-token:${PAT}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
     - |
+      ls
       if [ -z "$VERSION" ]; then echo "ERROR: VERSION is required"; exit 1; fi
-      BASE_TAG="${BASE_TAG:-$DEFAULT_BASE_TAG}"
       FULL_TAG="$BASE_TAG-$VERSION"
       echo "Building image: $IMAGE_NAME:$FULL_TAG"
       docker build -t "$IMAGE_NAME:$FULL_TAG" .
+      docker tag "$IMAGE_NAME:$FULL_TAG" "$IMAGE_NAME:latest"
       docker push "$IMAGE_NAME:$FULL_TAG"
+      docker push "$IMAGE_NAME:latest"
   only:
     - web
