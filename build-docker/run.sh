@@ -4,7 +4,7 @@
 ./wait-for-it.sh ${POSTGRES_HOST}:${POSTGRES_PORT}
 
 # Dump environment variables (required for running checkers with cron)
-env | egrep "^(PRAKTOMAT|COMPOSE_PROJECT_NAME|POSTGRES|PATH)" > praktomat.env
+env | egrep "^(PRAKTOMAT|COMPOSE_PROJECT_NAME|POSTGRES|USE_LDAP|PATH)" > praktomat.env
 
 # Start cron
 sudo cron
