@@ -1,7 +1,7 @@
 services:
   praktomat:
     container_name: ${COMPOSE_PROJECT_NAME}_praktomat
-    image: lehrstuhlkesdogan/praktomat:jdk21-noble
+    image: lehrstuhlkesdogan/praktomat:latest
     ports:
       - 80:443
     links:
@@ -17,7 +17,7 @@ services:
       - PRAKTOMAT_NAME
       - PRAKTOMAT_DOMAIN
       - PRAKTOMAT_ADMIN
-      - PRAKTOMAT_LDAP
+      - USE_LDAP
 
     secrets:
       - db_pass

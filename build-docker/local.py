@@ -102,7 +102,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SHIB_ENABLED = False
 
 # Set this to False to disable registration via the website, e.g. when Single Sign On is used
-if environ.get('PRAKTOMAT_LDAP', 'false').lower() == 'true':
+if environ.get('USE_LDAP', 'false').lower() in ('1', 'true', 't', 'yes', 'y'):
     REGISTRATION_POSSIBLE = False
     LDAP_ENABLED = True
     LDAP_URI = "ldaps://ldap.uni-regensburg.de"
