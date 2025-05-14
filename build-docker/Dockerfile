@@ -69,7 +69,13 @@ RUN chmod 440 /etc/sudoers
 
 USER praktomat
 WORKDIR /home/praktomat
-RUN git clone --recursive https://github.com/ITSec-UR/praktomat Praktomat && cd Praktomat
+
+# Install Python requirements for Praktomat (do it before application code, so it can be cached)
+COPY praktomat/requirements.txt Praktomat/requirements.txt
+RUN python3 -m pip install --break-system-packages -r Praktomat/requirements.txt
+
+# Install application code
+COPY --chown=praktomat praktomat Praktomat
 RUN sudo chown praktomat:tester Praktomat/src/checker/scripts/java
 RUN sudo chown praktomat:tester Praktomat/src/checker/scripts/javac
 RUN sudo chmod u+x,g+x,o-x Praktomat/src/checker/scripts/java
@@ -80,16 +86,13 @@ RUN echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/81b1373f17855a4dc21156cfe1694c31d7d1792e/wait-for-it.sh wait-for-it.sh
 RUN sudo chmod 775 wait-for-it.sh
 
-# Install Python requirements for Praktomat
-RUN python3 -m pip install --break-system-packages -r Praktomat/requirements.txt
-
 # Install necessary libraries for rsa keys
 COPY tools/create_rsakeys.py create_rsakeys.py
 RUN sudo python3 -m pip install --break-system-packages cryptography
 
 # Set executable/search flag for directories (only) located inside of /home/praktomat/.local
 # This is required for Apache in order to follow the symlinks to some files (referenced from static directory)
-RUN chmod -R g+X .local
+RUN find .local -type d -exec chmod g+X {} +
 
 # Install Praktomat addons
 ADD https://github.com/jplag/jplag/releases/download/v2.12.1-SNAPSHOT/jplag-2.12.1-SNAPSHOT-jar-with-dependencies.jar /opt/praktomat-addons/jplag.jar
