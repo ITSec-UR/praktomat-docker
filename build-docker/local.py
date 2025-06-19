@@ -50,18 +50,21 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 2000
 # Example: "/home/media/media.lawrence.com/"
 UPLOAD_ROOT = join(dirname(PRAKTOMAT_PATH), "work-data/")
 
-
+# A tuple that lists people who get code error notifications. When
+# DEBUG=False and a view raises an exception, Django will email these
+# people with the full exception information. Each member of the tuple
+# should be a tuple of (Full name, email address).
 ADMINS = [
     ('Praktomat Administrator', environ.get('PRAKTOMAT_ADMIN'))
 ]
 
-SERVER_EMAIL = environ.get('PRAKTOMAT_ADMIN')
+SERVER_EMAIL = f"system@{environ['PRAKTOMAT_DOMAIN']}"
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = join(UPLOAD_ROOT, "sent-mails")
-
-DEFAULT_FROM_EMAIL = environ.get('PRAKTOMAT_ADMIN')
+EMAIL_HOST = "mx.uni-regensburg.de"
+EMAIL_PORT = 25
+EMAIL_USE_TLS = False
+DEFAULT_FROM_EMAIL = f"noreply@{environ['PRAKTOMAT_DOMAIN']}"
 
 DEBUG = MIRROR
 
