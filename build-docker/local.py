@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
+from os import environ, makedirs
+from os.path import dirname, isfile, join
+
+import utilities.log_filter
+
 from . import defaults
 
 # Settings for deployment
-
-from os import environ
-from os.path import join, dirname, exists
 
 PRAKTOMAT_PATH = dirname(dirname(dirname(__file__)))
 
@@ -13,6 +16,7 @@ PRAKTOMAT_ID = environ['COMPOSE_PROJECT_NAME']
 
 SITE_NAME = environ['PRAKTOMAT_NAME']
 MIRROR = False
+DEBUG = MIRROR
 
 USING_ISABELLE = False
 
@@ -26,7 +30,6 @@ ALLOWED_HOSTS = ['*', ]
 # URL to use when referring to static files.
 # STATIC_URL = BASE_PATH + 'static/'
 # STATIC_ROOT = join(dirname(PRAKTOMAT_PATH), "static")
-
 
 # STATIC_URL now defined in settings/defaults.py
 # STATIC_ROOT now defined in settings/defaults.py
@@ -50,20 +53,71 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 2000
 # Example: "/home/media/media.lawrence.com/"
 UPLOAD_ROOT = join(dirname(PRAKTOMAT_PATH), "work-data/")
 
-
+# A tuple that lists people who get code error notifications. When
+# DEBUG=False and a view raises an exception, Django will email these
+# people with the full exception information. Each member of the tuple
+# should be a tuple of (Full name, email address).
 ADMINS = [
     ('Praktomat Administrator', environ.get('PRAKTOMAT_ADMIN'))
 ]
 
-SERVER_EMAIL = environ.get('PRAKTOMAT_ADMIN')
+SERVER_EMAIL = f"system@{environ['PRAKTOMAT_DOMAIN']}"
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = "mx.uni-regensburg.de"
+EMAIL_PORT = 25
+EMAIL_USE_TLS = False
+DEFAULT_FROM_EMAIL = f"noreply@{environ['PRAKTOMAT_DOMAIN']}"
 
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = join(UPLOAD_ROOT, "sent-mails")
+LOGGING_DIR = join(UPLOAD_ROOT, "logs")
+makedirs(LOGGING_DIR, exist_ok=True)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
 
-DEFAULT_FROM_EMAIL = environ.get('PRAKTOMAT_ADMIN')
+    'filters': {
+        'skip_unreadable_posts': {
+            '()': 'django.utils.log.CallbackFilter',
+            'callback': utilities.log_filter.skip_unreadable_post,
+        },
+    },
 
-DEBUG = MIRROR
+    'handlers': {
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': join(LOGGING_DIR, "error.log"),
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB per file
+            'backupCount': 3,
+            'formatter': 'verbose',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['skip_unreadable_posts'],
+            'class': 'django.utils.log.AdminEmailHandler',
+        },
+    },
+
+    'formatters': {
+        'verbose': {
+            'format': '[{asctime}] {levelname} {name} {message}',
+            'style': '{',
+        },
+    },
+
+    'loggers': {
+        'django.request': {
+            'handlers': ['file', 'mail_admins'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    }
+}
 
 DATABASES = {
     'default': {
@@ -77,7 +131,7 @@ DATABASES = {
 }
 
 db_pass = environ.get('POSTGRES_PASSWORD')
-if db_pass and exists(db_pass):
+if db_pass and isfile(db_pass):
     with open(db_pass) as f:
         DATABASES['default']['PASSWORD'] = f.read()
 

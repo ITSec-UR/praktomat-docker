@@ -14,7 +14,7 @@ Create a `.env` file with the following variables:
 - `COMPOSE_PROJECT_NAME`: ID of your Praktomat instance (e.g., course name). This determines the sub-path of your URL (e.g., `https://localhost/your-praktomat-id`).
 - `PRAKTOMAT_NAME`: Name displayed on the web interface.
 - `PRAKTOMAT_DOMAIN`: Domain where your Praktomat will be accessible.
-- `PRAKTOMAT_ADMIN`: Email address of the Praktomat admin.
+- `PRAKTOMAT_ADMIN`: Email address of the Praktomat admin to receive server notifications.
 - `USE_LDAP`: Set to `True` to enable LDAP authentication (disables local registration).
 - `POSTGRES_HOST`: Hostname of your PostgreSQL service (e.g., `db`). Must be on the same Docker network.
 - `POSTGRES_DB`: Database name.
