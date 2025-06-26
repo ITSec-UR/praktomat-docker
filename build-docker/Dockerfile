@@ -48,7 +48,7 @@ RUN apt-get update && apt-get install -yq \
 # Install java
 RUN apt-get update && apt install -y openjdk-${JAVA_VERSION}-jdk junit4 junit && rm -rf /var/lib/apt/lists/*
 
-#RUN ln -s /usr/bin/python3 /usr/bin/python
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
 # Setup locale
 RUN locale-gen en_US.UTF-8
