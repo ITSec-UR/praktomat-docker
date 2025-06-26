@@ -1,15 +1,16 @@
 # Makefile
 
+# General settings
 IMAGE_NAME=lehrstuhlkesdogan/praktomat
 PRAKTOMAT_REPO=https://github.com/ITSec-UR/praktomat
-PRAKTOMAT_DIR=praktomat
 
-APP_VERSION_FILE=src/settings/version.py
-RAW_APP_VERSION_FILE := $(PRAKTOMAT_REPO)/raw/master/$(APP_VERSION_FILE)
+# Building settings
+UBUNTU_VERSION=noble
+JAVA_VERSION=21
 
-BASE_TAG := $(shell git describe --tags $(shell git rev-list --tags --max-count=1) || echo "dev")
-APP_VERSION := $(shell wget -q -O - $(RAW_APP_VERSION_FILE) | grep '__version__' | cut -d '"' -f2)
-TAG := $(if $(APP_VERSION),$(APP_VERSION)-$(BASE_TAG),$(BASE_TAG))
+PRAKTOMAT_DIR := $(notdir $(PRAKTOMAT_REPO))
+PRAKTOMAT_COMMIT := $(shell git ls-remote $(PRAKTOMAT_REPO) HEAD | awk '{ print substr($$1,1,7) }')
+TAG := $(UBUNTU_VERSION)-jdk$(JAVA_VERSION)-git$(PRAKTOMAT_COMMIT)
 
 NO_CACHE ?=
 DOCKER_NO_CACHE := $(if $(NO_CACHE),--no-cache,)
@@ -25,20 +26,27 @@ clone:
 		echo "$(PRAKTOMAT_DIR) already cloned."; \
 	fi
 
-build: clone
+build-unchecked: clone
+	docker build $(DOCKER_NO_CACHE) \
+		--build-arg UBUNTU_VERSION=$(UBUNTU_VERSION) \
+		--build-arg JAVA_VERSION=$(JAVA_VERSION) \
+		--build-arg PRAKTOMAT_DIR=$(PRAKTOMAT_DIR) \
+		-t $(IMAGE_NAME):$(TAG) .
+	docker tag $(IMAGE_NAME):$(TAG) $(IMAGE_NAME):latest
+
+# Build image only if it doesn't exist
+build:
+	@echo "Building $(IMAGE_NAME):$(TAG) ..."
 	@if docker images $(IMAGE_NAME):$(TAG) | grep -q $(TAG); then \
 		echo "Image $(IMAGE_NAME):$(TAG) already exists. Skipping build."; \
 	else \
-		echo "Building $(IMAGE_NAME):$(TAG)..."; \
-		docker build $(DOCKER_NO_CACHE) -t $(IMAGE_NAME):$(TAG) .; \
-		docker tag $(IMAGE_NAME):$(TAG) $(IMAGE_NAME):latest; \
+		$(MAKE) build-unchecked; \
 	fi
 
 # Rebuild the image (force clean rebuild)
-rebuild: clone
-	@echo "Rebuilding $(IMAGE_NAME):$(TAG)..."
-	docker build $(DOCKER_NO_CACHE) -t $(IMAGE_NAME):$(TAG) .
-	docker tag $(IMAGE_NAME):$(TAG) $(IMAGE_NAME):latest
+rebuild: clean
+	@echo "Rebuilding $(IMAGE_NAME):$(TAG) ..."
+	$(MAKE) build-unchecked
 
 push: build
 	docker push $(IMAGE_NAME):$(TAG)
@@ -46,7 +54,7 @@ push: build
 	echo "Successfully pushed $(IMAGE_NAME):$(TAG)"
 
 clean:
-	@echo "Cleaning up Docker images ($(IMAGE_NAME):$(TAG))..."
+	@echo "Cleaning up Docker images ($(IMAGE_NAME):$(TAG)) ..."
 	rm -rf $(PRAKTOMAT_DIR)
-	docker rmi $(IMAGE_NAME):latest 2>/dev/null || true
-	docker rmi $(IMAGE_NAME):$(TAG) 2>/dev/null || true
+	-docker rmi $(IMAGE_NAME):latest
+	-docker rmi $(IMAGE_NAME):$(TAG)

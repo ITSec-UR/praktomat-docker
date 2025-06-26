@@ -1,4 +1,9 @@
-FROM ubuntu:noble
+ARG UBUNTU_VERSION=noble
+
+FROM ubuntu:$UBUNTU_VERSION
+ARG JAVA_VERSION=21
+ARG PRAKTOMAT_DIR=praktomat
+
 EXPOSE 443/tcp
 
 # Remove default ubuntu user
@@ -40,8 +45,8 @@ RUN apt-get update && apt-get install -yq \
   lsb-release \
   && rm -rf /var/lib/apt/lists/*
 
-# Install java (openjdk-21)
-RUN apt-get update && apt install -y openjdk-21-jdk junit4 junit && rm -rf /var/lib/apt/lists/*
+# Install java
+RUN apt-get update && apt install -y openjdk-${JAVA_VERSION}-jdk junit4 junit && rm -rf /var/lib/apt/lists/*
 
 #RUN ln -s /usr/bin/python3 /usr/bin/python
 
@@ -71,11 +76,11 @@ USER praktomat
 WORKDIR /home/praktomat
 
 # Install Python requirements for Praktomat (do it before application code, so it can be cached)
-COPY praktomat/requirements.txt Praktomat/requirements.txt
+COPY ${PRAKTOMAT_DIR}/requirements.txt Praktomat/requirements.txt
 RUN python3 -m pip install --break-system-packages -r Praktomat/requirements.txt
 
 # Install application code
-COPY --chown=praktomat praktomat Praktomat
+COPY --chown=praktomat ${PRAKTOMAT_DIR} Praktomat
 RUN sudo chown praktomat:tester Praktomat/src/checker/scripts/java
 RUN sudo chown praktomat:tester Praktomat/src/checker/scripts/javac
 RUN sudo chmod u+x,g+x,o-x Praktomat/src/checker/scripts/java

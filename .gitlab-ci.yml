@@ -5,6 +5,8 @@ image: docker:latest
 
 variables:
   DOCKER_DRIVER: overlay2
+  JAVA_VERSION: "21"
+  UBUNTU_VERSION: "noble"
 
 build:
   stage: build
@@ -16,7 +18,7 @@ build:
   script:
     - echo "Triggered by $CI_PIPELINE_SOURCE"
     - cd build-docker
-    - make rebuild push
+    - make rebuild push JAVA_VERSION=$JAVA_VERSION UBUNTU_VERSION=$UBUNTU_VERSION
   only:
     - branches
     - triggers
