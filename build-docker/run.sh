@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [ ! -f /srv/praktomat/mailsign/signer.pem ] || [ ! -f /srv/praktomat/mailsign/signer_key.pem ]; then
+    sudo python3 create_rsakeys.py /srv/praktomat/mailsign
+fi
+
 # Wait for database to be available
 ./wait-for-it.sh ${POSTGRES_HOST}:${POSTGRES_PORT}
 
