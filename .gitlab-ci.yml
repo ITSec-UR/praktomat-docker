@@ -1,7 +1,8 @@
 stages:
   - build
 
-image: docker:latest
+# Docker version on host system
+image: docker:20.10.21
 
 variables:
   DOCKER_DRIVER: overlay2
@@ -13,7 +14,7 @@ build:
   tags:
     - docker
   before_script:
-    - apk add make
+    - apk add --no-cache make git
     - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
   script:
     - echo "Triggered by $CI_PIPELINE_SOURCE"
