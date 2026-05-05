@@ -1,7 +1,7 @@
 ARG UBUNTU_VERSION=questing
 
 FROM ubuntu:$UBUNTU_VERSION
-ARG JAVA_VERSION=21
+ARG JAVA_VERSION
 ARG PRAKTOMAT_DIR=praktomat
 
 EXPOSE 443/tcp
@@ -44,6 +44,8 @@ RUN apt-get update && apt-get install -yq \
   gnupg \
   lsb-release \
   && rm -rf /var/lib/apt/lists/*
+
+RUN update-alternatives --set sudo /usr/bin/sudo.ws
 
 # Install java
 RUN apt-get update && apt install -y openjdk-${JAVA_VERSION}-jdk junit4 junit && rm -rf /var/lib/apt/lists/*

@@ -18,13 +18,14 @@ services:
       - PRAKTOMAT_DOMAIN
       - PRAKTOMAT_ADMIN
       - USE_LDAP
+    init: true
 
     secrets:
       - db_pass
 
   db:
     container_name: ${COMPOSE_PROJECT_NAME}_db
-    image: postgres:17.4-alpine
+    image: postgres:18.3-alpine
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD_FILE=${POSTGRES_PASSWORD}

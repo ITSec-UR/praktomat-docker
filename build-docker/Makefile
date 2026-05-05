@@ -1,12 +1,16 @@
 # Makefile
 
+# Load building env variables
+-include build.env
+export
+
 # General settings
 IMAGE_NAME=lehrstuhlkesdogan/praktomat
 PRAKTOMAT_REPO=https://github.com/ITSec-UR/praktomat
 
 # Building settings
-UBUNTU_VERSION=noble
-JAVA_VERSION=21
+UBUNTU_VERSION ?= questing
+JAVA_VERSION ?= 25
 
 PRAKTOMAT_DIR := $(notdir $(PRAKTOMAT_REPO))
 PRAKTOMAT_COMMIT := $(shell git ls-remote $(PRAKTOMAT_REPO) HEAD | awk '{ print substr($$1,1,7) }')
@@ -37,7 +41,7 @@ build-unchecked: clone
 # Build image only if it doesn't exist
 build:
 	@echo "Building $(IMAGE_NAME):$(TAG) ..."
-	@if docker images $(IMAGE_NAME):$(TAG) | grep -q $(TAG); then \
+	@if docker images -q $(IMAGE_NAME):$(TAG) | grep -q $(TAG); then \
 		echo "Image $(IMAGE_NAME):$(TAG) already exists. Skipping build."; \
 	else \
 		$(MAKE) build-unchecked; \
