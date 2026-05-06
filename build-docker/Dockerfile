@@ -130,8 +130,10 @@ RUN printf "\nInclude /home/praktomat/Praktomat/documentation/apache_praktomat_w
 COPY mpm_event.conf /etc/apache2/mods-available/mpm_event.conf
 
 # Configure OpenLDAP
-COPY ldapserver.pem /etc/ssl/certs/ldapserver.pem
-RUN printf "\nTLS_CACERT    /etc/ssl/certs/ldapserver.pem\n" | sudo tee -a /etc/ldap/ldap.conf
+# COPY ldapserver.pem /etc/ssl/certs/ldapserver.pem
+COPY ldap-ur-ca.crt /etc/ssl/certs/ldap-ur-ca.crt 
+# RUN printf "\nTLS_CACERT    /etc/ssl/certs/ldapserver.pem\n" | sudo tee -a /etc/ldap/ldap.conf
+RUN printf "\nTLS_CACERT    /etc/ssl/certs/ldap-ur-ca.crt\n" | sudo tee -a /etc/ldap/ldap.conf
 
 # Initialize Praktomat
 RUN PRAKTOMAT_ID="" PRAKTOMAT_NAME="" PRAKTOMAT_DOMAIN="" POSTGRES_USER="" POSTGRES_PASSWORD="" POSTGRES_HOST="" POSTGRES_PORT="" python3 Praktomat/src/manage-local.py collectstatic --noinput --link
