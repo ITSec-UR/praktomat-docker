@@ -11,7 +11,7 @@ docker compose up -d
 ### Required Environment Variables
 Create a `.env` file with the following variables:
 
-- `COMPOSE_PROJECT_NAME`: ID of your Praktomat instance (e.g., course name). This determines the sub-path of your URL (e.g., `https://localhost/your-praktomat-id`).
+- `PRAKTOMAT_ID`: ID of your Praktomat instance (e.g., course name). This determines the sub-path of your URL (e.g., `https://localhost/your-praktomat-id`).
 - `PRAKTOMAT_NAME`: Name displayed on the web interface.
 - `PRAKTOMAT_DOMAIN`: Domain where your Praktomat will be accessible.
 - `PRAKTOMAT_ADMIN`: Email address of the Praktomat admin to receive server notifications.
@@ -34,7 +34,7 @@ python3 Praktomat/src/manage-local.py createsuperuser
 Your Praktomat instance will be accessible at:
 
 ```
-http://PRAKTOMAT_DOMAIN/COMPOSE_PROJECT_NAME
+http://PRAKTOMAT_DOMAIN/PRAKTOMAT_ID
 ```
 
 ## Build docker container

@@ -1,7 +1,7 @@
 ARG UBUNTU_VERSION=questing
 
 FROM ubuntu:$UBUNTU_VERSION
-ARG JAVA_VERSION
+ARG JAVA_VERSION=21
 ARG PRAKTOMAT_DIR=praktomat
 
 EXPOSE 443/tcp
@@ -59,16 +59,22 @@ ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US.UTF-8
 
 # Install Docker
-#RUN mkdir -p /etc/apt/keyrings
-#RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-#RUN echo \
-#  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-#  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-#RUN apt-get update && apt-get install -yq \
-#  docker-ce-cli \
-#  && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /etc/apt/keyrings
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+RUN echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+RUN apt-get update && apt-get install -yq \
+  docker-ce-cli \
+  && rm -rf /var/lib/apt/lists/*
 
 # Add users
+# The praktomat user has UID 1000 explicitly.
+# This allows an easier access to the files in work-data when the host user has
+# UID 1000 as well. Otherwise, files written inside the container will have the
+# praktomat user's UID. If that is not 1000, this UID leaks to the host system
+# and tin he default case (single user with UID 1000), the host user can't fully
+# access the files without using tools like sudo.
 RUN useradd -m praktomat -u 1000 && adduser praktomat sudo
 RUN useradd -m tester && adduser tester sudo && adduser tester praktomat
 COPY sudoers /etc/sudoers
@@ -79,7 +85,7 @@ WORKDIR /home/praktomat
 
 # Install Python requirements for Praktomat (do it before application code, so it can be cached)
 COPY ${PRAKTOMAT_DIR}/requirements.txt Praktomat/requirements.txt
-RUN python3 -m pip install --break-system-packages -r Praktomat/requirements.txt
+RUN python3 -m pip install --break-system-packages --use-pep517 -r Praktomat/requirements.txt
 
 # Install application code
 COPY --chown=praktomat ${PRAKTOMAT_DIR} Praktomat
@@ -107,9 +113,6 @@ ADD https://github.com/checkstyle/checkstyle/releases/download/checkstyle-8.14/c
 RUN sudo chown -R praktomat:praktomat /opt/praktomat-addons
 RUN chmod -R 640 /opt/praktomat-addons/*
 
-# Install safe-docker
-#ADD https://raw.githubusercontent.com/nomeata/safe-docker/master/safe-docker /usr/local/bin/safe-docker
-
 # Copy config file
 COPY local.py Praktomat/src/settings/local.py
 
@@ -131,7 +134,7 @@ COPY ldapserver.pem /etc/ssl/certs/ldapserver.pem
 RUN printf "\nTLS_CACERT    /etc/ssl/certs/ldapserver.pem\n" | sudo tee -a /etc/ldap/ldap.conf
 
 # Initialize Praktomat
-RUN COMPOSE_PROJECT_NAME="" PRAKTOMAT_NAME="" PRAKTOMAT_DOMAIN="" USE_LDAP="" POSTGRES_USER="" POSTGRES_PASSWORD="" POSTGRES_HOST="" POSTGRES_PORT="" python3 Praktomat/src/manage-local.py collectstatic --noinput --link
+RUN PRAKTOMAT_ID="" PRAKTOMAT_NAME="" PRAKTOMAT_DOMAIN="" POSTGRES_USER="" POSTGRES_PASSWORD="" POSTGRES_HOST="" POSTGRES_PORT="" python3 Praktomat/src/manage-local.py collectstatic --noinput --link
 
 # Configure Cron to automatically run all checkers
 COPY daily-cron.sh daily-cron.sh

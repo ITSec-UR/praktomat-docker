@@ -1,20 +1,36 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from os import environ, makedirs
+import os
 from os.path import dirname, isfile, join
-
 import utilities.log_filter
-
 from . import defaults
+
+
+class Env:
+    @staticmethod
+    def string(name: str, default: str | None = None):
+        val = os.environ.get(name, default)
+        return None if val is None or val.lower() in ('none', '') else val
+
+    @staticmethod
+    def boolean(name: str, default: bool = False):
+        val = os.environ.get(name, str(default)).lower()
+        return val in ('true', '1', 'yes', 't', 'y')
+
+    @staticmethod
+    def integer(name: str, default: int = 0):
+        try:
+            return int(os.environ.get(name, default))
+        except (ValueError, TypeError):
+            return default
 
 # Settings for deployment
 
 PRAKTOMAT_PATH = dirname(dirname(dirname(__file__)))
+PRAKTOMAT_ID = os.environ['PRAKTOMAT_ID']
+SITE_NAME = os.environ['PRAKTOMAT_NAME']
 
-PRAKTOMAT_ID = environ['COMPOSE_PROJECT_NAME']
-
-SITE_NAME = environ['PRAKTOMAT_NAME']
 MIRROR = False
 DEBUG = MIRROR
 
@@ -22,9 +38,8 @@ USING_ISABELLE = False
 
 # The URL where this site is reachable. 'http://localhost:443/' in case of the
 # development server.
-BASE_HOST = 'http://' + environ['PRAKTOMAT_DOMAIN'] + ':443'
-BASE_PATH = '/' + PRAKTOMAT_ID + '/'
-
+BASE_HOST = f'http://{os.environ['PRAKTOMAT_DOMAIN']}:443'
+BASE_PATH = f'/{PRAKTOMAT_ID}/'
 ALLOWED_HOSTS = ['*', ]
 
 # URL to use when referring to static files.
@@ -57,20 +72,23 @@ UPLOAD_ROOT = join(dirname(PRAKTOMAT_PATH), "work-data/")
 # DEBUG=False and a view raises an exception, Django will email these
 # people with the full exception information. Each member of the tuple
 # should be a tuple of (Full name, email address).
-ADMINS = [
-    ('Praktomat Administrator', environ.get('PRAKTOMAT_ADMIN'))
-]
-
-SERVER_EMAIL = f"system@{environ['PRAKTOMAT_DOMAIN']}"
+admin_mail = Env.string('PRAKTOMAT_ADMIN')
+ADMINS = [('Praktomat Administrator', admin_mail)] if admin_mail else []
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = "mx.uni-regensburg.de"
-EMAIL_PORT = 25
-EMAIL_USE_TLS = False
-DEFAULT_FROM_EMAIL = f"noreply@{environ['PRAKTOMAT_DOMAIN']}"
+EMAIL_HOST = Env.string('PRAKTOMAT_EMAIL_HOST')
+EMAIL_PORT = Env.integer('PRAKTOMAT_EMAIL_PORT', 25)
+EMAIL_USE_TLS = Env.boolean('PRAKTOMAT_EMAIL_TLS', False)
+DEFAULT_FROM_EMAIL = f"noreply@{os.environ['PRAKTOMAT_DOMAIN']}"
+SERVER_EMAIL = f"system@{os.environ['PRAKTOMAT_DOMAIN']}"
 
 LOGGING_DIR = join(UPLOAD_ROOT, "logs")
-makedirs(LOGGING_DIR, exist_ok=True)
+os.makedirs(LOGGING_DIR, exist_ok=True)
+
+request_handlers = ['file']
+if admin_mail:
+    request_handlers.append('mail_admins')
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -95,6 +113,7 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['skip_unreadable_posts'],
             'class': 'django.utils.log.AdminEmailHandler',
+            'include_html': True,
         },
     },
 
@@ -107,7 +126,7 @@ LOGGING = {
 
     'loggers': {
         'django.request': {
-            'handlers': ['file', 'mail_admins'],
+            'handlers': request_handlers,
             'level': 'INFO',
             'propagate': False,
         },
@@ -122,15 +141,15 @@ LOGGING = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME':   environ.get('POSTGRES_USER'),
-        'USER':   environ.get('POSTGRES_USER'),
-        'PASSWORD':   environ.get('POSTGRES_PASSWORD'),
-        'HOST':   environ.get('POSTGRES_HOST'),
-        'PORT':   environ.get('POSTGRES_PORT')
+        'NAME':   os.environ.get('POSTGRES_USER'),
+        'USER':   os.environ.get('POSTGRES_USER'),
+        'PASSWORD':   os.environ.get('POSTGRES_PASSWORD'),
+        'HOST':   os.environ.get('POSTGRES_HOST'),
+        'PORT':   os.environ.get('POSTGRES_PORT')
     }
 }
 
-db_pass = environ.get('POSTGRES_PASSWORD')
+db_pass = os.environ.get('POSTGRES_PASSWORD')
 if db_pass and isfile(db_pass):
     with open(db_pass) as f:
         DATABASES['default']['PASSWORD'] = f.read()
@@ -152,15 +171,19 @@ CERTIFICATE = '/srv/praktomat/mailsign/signer.pem'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
+
+# --- LDAP & Registration ---
+
 # Enable Shibboleth:
 SHIB_ENABLED = False
 
+LDAP_URI = Env.string('PRAKTOMAT_LDAP_URI')
+LDAP_BASE = Env.string('PRAKTOMAT_LDAP_BASE')
+
 # Set this to False to disable registration via the website, e.g. when Single Sign On is used
-if environ.get('USE_LDAP', 'false').lower() in ('1', 'true', 't', 'yes', 'y'):
+if LDAP_URI and LDAP_BASE:
     REGISTRATION_POSSIBLE = False
     LDAP_ENABLED = True
-    LDAP_URI = "ldaps://ldap.uni-regensburg.de"
-    LDAP_BASE = "o=uni-regensburg,c=de"
     DUMMY_MAT_NUMBERS = True
     ACCOUNT_CHANGE_POSSIBLE = False
 else:
@@ -169,19 +192,24 @@ else:
 
 SYSADMIN_MOTD_URL = None
 
-# Use a dedicated user to test submissions
-USEPRAKTOMATTESTER = True
 
-# It is recomendet to use DOCKER and not a tester account
+# It is recommended to use DOCKER and not a tester account
+DOCKER_IMAGE_NAME = Env.string('PRAKTOMAT_CHECKER_IMAGE', 'checker')
+if DOCKER_IMAGE_NAME:
+    # Use docker to test submission
+    USEPRAKTOMATTESTER = False
+    USESAFEDOCKER = True
 
-# Use docker to test submission
-USESAFEDOCKER = False
-# DOCKER_IMAGE_NAME = environ.get('PRAKTOMAT_CHECKER_IMAGE')
-# DOCKER_CONTAINER_WRITABLE = environ.get('PRAKTOMAT_CHECKER_WRITABLE', 'False') == 'True'
-# DOCKER_UID_MOD = environ.get('PRAKTOMAT_CHECKER_UID_MOD') == 'True'
-# DOCKER_CONTAINER_EXTERNAL_DIR = environ.get('PRAKTOMAT_CHECKER_EXTERNAL_DIR')
-# DOCKER_CONTAINER_HOST_NET = environ.get('PRAKTOMAT_CHECKER_ENABLE_NETWORK') == 'True'
-# DOCKER_DISCARD_ARTEFACTS = True
+    DOCKER_CONTAINER_WRITABLE = Env.boolean('PRAKTOMAT_CHECKER_WRITABLE', False)
+    DOCKER_UID_MOD = Env.boolean('PRAKTOMAT_CHECKER_UID_MOD', True)
+    DOCKER_CONTAINER_EXTERNAL_DIR = Env.string('PRAKTOMAT_CHECKER_EXTERNAL_DIR')
+    DOCKER_CONTAINER_HOST_NET = Env.boolean('PRAKTOMAT_CHECKER_ENABLE_NETWORK')
+    DOCKER_DISCARD_ARTEFACTS = Env.boolean('PRAKTOMAT_CHECKER_DISCARD_ARTEFACTS', True)
+else:
+    # Use a dedicated user to test submissions
+    USEPRAKTOMATTESTER = True
+    USESAFEDOCKER = False
+
 
 # Linux User "tester" and Usergroup "praktomat"
 # Enable to run all scripts (checker) as the unix user 'tester'.

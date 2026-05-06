@@ -1,9 +1,11 @@
 services:
   praktomat:
-    container_name: ${COMPOSE_PROJECT_NAME}_praktomat
+    container_name: ${PRAKTOMAT_ID}_praktomat
     image: lehrstuhlkesdogan/praktomat:latest
     ports:
       - 80:443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     links:
       - db
     depends_on:
@@ -13,18 +15,17 @@ services:
       - POSTGRES_PASSWORD
       - POSTGRES_HOST
       - POSTGRES_PORT
-      - COMPOSE_PROJECT_NAME
+      - PRAKTOMAT_ID
       - PRAKTOMAT_NAME
       - PRAKTOMAT_DOMAIN
       - PRAKTOMAT_ADMIN
-      - USE_LDAP
     init: true
 
     secrets:
       - db_pass
 
   db:
-    container_name: ${COMPOSE_PROJECT_NAME}_db
+    container_name: ${PRAKTOMAT_ID}_db
     image: postgres:18.3-alpine
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
