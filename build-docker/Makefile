@@ -10,7 +10,7 @@ PRAKTOMAT_REPO=https://github.com/ITSec-UR/praktomat
 
 # Building settings
 UBUNTU_VERSION ?= questing
-JAVA_VERSION ?= 25
+JAVA_VERSION ?= 21
 
 PRAKTOMAT_DIR := $(notdir $(PRAKTOMAT_REPO))
 PRAKTOMAT_COMMIT := $(shell git ls-remote $(PRAKTOMAT_REPO) HEAD | awk '{ print substr($$1,1,7) }')
@@ -55,7 +55,7 @@ rebuild: clean
 push: build
 	docker push $(IMAGE_NAME):$(TAG)
 	docker push $(IMAGE_NAME):latest
-	echo "Successfully pushed $(IMAGE_NAME):$(TAG)"
+	@echo "Successfully pushed $(IMAGE_NAME):$(TAG)"
 
 clean:
 	@echo "Cleaning up Docker images ($(IMAGE_NAME):$(TAG)) ..."

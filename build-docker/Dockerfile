@@ -81,6 +81,7 @@ COPY sudoers /etc/sudoers
 RUN chmod 440 /etc/sudoers
 
 USER praktomat
+ENV PATH="/home/praktomat/.local/bin:${PATH}"
 WORKDIR /home/praktomat
 
 # Install Python requirements for Praktomat (do it before application code, so it can be cached)
@@ -93,7 +94,6 @@ RUN sudo chown praktomat:tester Praktomat/src/checker/scripts/java
 RUN sudo chown praktomat:tester Praktomat/src/checker/scripts/javac
 RUN sudo chmod u+x,g+x,o-x Praktomat/src/checker/scripts/java
 RUN sudo chmod u+x,g+x,o-x Praktomat/src/checker/scripts/javac
-RUN echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 
 # Get wait-for-it.sh (used to wait for PostgreSQL to become available)
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/81b1373f17855a4dc21156cfe1694c31d7d1792e/wait-for-it.sh wait-for-it.sh
