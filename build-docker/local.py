@@ -194,7 +194,7 @@ SYSADMIN_MOTD_URL = None
 
 
 # It is recommended to use DOCKER and not a tester account
-DOCKER_IMAGE_NAME = Env.string('PRAKTOMAT_CHECKER_IMAGE', 'checker')
+DOCKER_IMAGE_NAME = Env.string('PRAKTOMAT_CHECKER_IMAGE')
 if DOCKER_IMAGE_NAME:
     # Use docker to test submission
     USEPRAKTOMATTESTER = False
