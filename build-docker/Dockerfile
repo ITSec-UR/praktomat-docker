@@ -130,9 +130,7 @@ RUN printf "\nInclude /home/praktomat/Praktomat/documentation/apache_praktomat_w
 COPY mpm_event.conf /etc/apache2/mods-available/mpm_event.conf
 
 # Configure OpenLDAP
-# COPY ldapserver.pem /etc/ssl/certs/ldapserver.pem
 COPY ldap-ur-ca.crt /etc/ssl/certs/ldap-ur-ca.crt 
-# RUN printf "\nTLS_CACERT    /etc/ssl/certs/ldapserver.pem\n" | sudo tee -a /etc/ldap/ldap.conf
 RUN printf "\nTLS_CACERT    /etc/ssl/certs/ldap-ur-ca.crt\n" | sudo tee -a /etc/ldap/ldap.conf
 
 # Initialize Praktomat
