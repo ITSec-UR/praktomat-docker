@@ -72,12 +72,11 @@ UPLOAD_ROOT = join(dirname(PRAKTOMAT_PATH), "work-data/")
 # DEBUG=False and a view raises an exception, Django will email these
 # people with the full exception information. Each member of the tuple
 # should be a tuple of (Full name, email address).
-email_host = Env.string('PRAKTOMAT_EMAIL_HOST')
+EMAIL_HOST = Env.string('PRAKTOMAT_EMAIL_HOST')
 
-if email_host:
+if EMAIL_HOST:
     ADMINS = [('Praktomat Administrator', Env.string('PRAKTOMAT_ADMIN'))]
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = email_host
     EMAIL_PORT = Env.integer('PRAKTOMAT_EMAIL_PORT', 25)
     EMAIL_USE_TLS = Env.boolean('PRAKTOMAT_EMAIL_TLS', False)
     DEFAULT_FROM_EMAIL = f"noreply@{os.environ['PRAKTOMAT_DOMAIN']}"
@@ -90,7 +89,7 @@ LOGGING_DIR = join(UPLOAD_ROOT, "logs")
 os.makedirs(LOGGING_DIR, exist_ok=True)
 
 request_handlers = ['file']
-if email_host:
+if EMAIL_HOST:
     request_handlers.append('mail_admins')
 
 LOGGING = {
@@ -181,20 +180,19 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Enable Shibboleth:
 SHIB_ENABLED = False
 
-ldap_uri = Env.string('PRAKTOMAT_LDAP_URI')
-ldap_base = Env.string('PRAKTOMAT_LDAP_BASE')
+LDAP_URI = Env.string('PRAKTOMAT_LDAP_URI')
+LDAP_BASE = Env.string('PRAKTOMAT_LDAP_BASE')
 
 # Set this to False to disable registration via the website, e.g. when Single Sign On is used
-if ldap_uri and ldap_base:
+if LDAP_URI and LDAP_BASE:
     REGISTRATION_POSSIBLE = False
     LDAP_ENABLED = True
-    LDAP_URI = ldap_uri
-    LDAP_BASE = ldap_base
     DUMMY_MAT_NUMBERS = True
     ACCOUNT_CHANGE_POSSIBLE = False
 else:
     LDAP_ENABLED = False
     REGISTRATION_POSSIBLE = True
+    AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.AllowAllUsersModelBackend',)
 
 SYSADMIN_MOTD_URL = None
 
